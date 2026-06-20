@@ -25,8 +25,11 @@
 // THE SOFTWARE.
 
 using System;
+using System.Collections.Generic;
 using Cairo;
+using Gtk;
 using Pinta.Core;
+
 
 namespace Pinta.Tools;
 
@@ -37,6 +40,42 @@ public sealed class MoveSelectedTool : BaseTransformTool
 	private readonly Matrix original_transform = CairoExtensions.CreateIdentityMatrix ();
 
 	private readonly SystemManager system_manager;
+
+	private Separator? separator;
+	private Separator Separator => separator ??= GtkExtensions.CreateToolBarSeparator ();
+
+	private Label? resampling_label;
+	private Label ResamplingLabel => resampling_label ??= Label.New (Translations.GetString (" Resampling: "));
+
+	private ToolBarComboBox? resampling_combo_box;
+	private readonly IReadOnlyDictionary<string, ResamplingMode> resampling_modes = new Dictionary<string, ResamplingMode> {
+		[ResamplingMode.Bilinear.GetLabel ()] = ResamplingMode.Bilinear,
+		[ResamplingMode.NearestNeighbor.GetLabel ()] = ResamplingMode.NearestNeighbor,
+	};
+
+	private ResamplingMode current_resampling_mode = ResamplingMode.Bilinear;
+
+	private ToolBarComboBox ResamplingComboBox {
+		get {
+			if (resampling_combo_box is null) {
+				resampling_combo_box = new ToolBarComboBox (120, 0, false);
+
+				foreach (var mode in resampling_modes)
+					resampling_combo_box.ComboBox.AppendText (mode.Key);
+
+				resampling_combo_box.ComboBox.Active = Settings.GetSetting (
+					SettingNames.ToolResamplingMode (this),
+					0);
+
+				resampling_combo_box.ComboBox.OnChanged += (o, e) => {
+					current_resampling_mode = resampling_modes[resampling_combo_box.ComboBox.GetActiveText ()!];
+				};
+			}
+
+			return resampling_combo_box;
+		}
+	}
+
 	public MoveSelectedTool (IServiceProvider services) : base (services)
 	{
 		system_manager = services.GetService<SystemManager> ();
@@ -56,6 +95,15 @@ public sealed class MoveSelectedTool : BaseTransformTool
 	public override Gdk.Cursor DefaultCursor => Gdk.Cursor.NewFromTexture (Resources.GetIcon (Pinta.Resources.Icons.ToolMoveCursor), 0, 0, null);
 	public override Gdk.Key ShortcutKey => new (Gdk.Constants.KEY_M);
 	public override int Priority => 5;
+
+	protected override void OnBuildToolBar (Gtk.Box tb)
+	{
+		base.OnBuildToolBar (tb);
+
+		tb.Append (Separator);
+		tb.Append (ResamplingLabel);
+		tb.Append (ResamplingComboBox);
+	}
 
 	protected override RectangleD GetSourceRectangle (Document document)
 		=> document.Selection.GetBounds ();
@@ -135,13 +183,21 @@ public sealed class MoveSelectedTool : BaseTransformTool
 
 	protected override void OnCommit (Document? document)
 	{
-		document?.FinishSelection ();
+		document?.FinishSelection (current_resampling_mode);
 	}
 
 	protected override void OnDeactivated (Document? document, BaseTool? newTool)
 	{
 		base.OnDeactivated (document, newTool);
 
-		document?.FinishSelection ();
+		document?.FinishSelection (current_resampling_mode);
+	}
+
+	protected override void OnSaveSettings (ISettingsService settings)
+	{
+		base.OnSaveSettings (settings);
+
+		if (resampling_combo_box is not null)
+			settings.PutSetting (SettingNames.ToolResamplingMode (this), resampling_combo_box.ComboBox.Active);
 	}
 }

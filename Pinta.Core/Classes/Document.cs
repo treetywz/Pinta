@@ -214,7 +214,7 @@ public sealed class Document
 		return g;
 	}
 
-	public void FinishSelection ()
+	public void FinishSelection (ResamplingMode resamplingMode = ResamplingMode.Bilinear)
 	{
 		// We don't have an uncommitted layer, abort
 		if (!Layers.ShowSelectionLayer)
@@ -228,7 +228,7 @@ public sealed class Document
 
 		using Context g = new (Layers.CurrentUserLayer.Surface);
 		selection.Clip (g);
-		layer.DrawWithOperator (g, Operator.Source, opacity: 1.0, transform: true);
+		layer.DrawWithOperator (g, Operator.Source, opacity: 1.0, transform: true, resamplingMode: resamplingMode);
 
 		Layers.DestroySelectionLayer ();
 		Workspace.Invalidate ();

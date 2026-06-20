@@ -145,9 +145,14 @@ public class Layer : ObservableObject
 		ctx.Restore ();
 	}
 
-	public void DrawWithOperator (Context ctx, Operator op, double opacity = 1.0, bool transform = true)
+	public void DrawWithOperator (
+		Context ctx,
+		Operator op,
+		double opacity = 1.0,
+		bool transform = true,
+		ResamplingMode resamplingMode = ResamplingMode.Bilinear)
 	{
-		DrawWithOperator (ctx, Surface, op, opacity, transform);
+		DrawWithOperator (ctx, Surface, op, opacity, transform, resamplingMode);
 	}
 
 	public void DrawWithOperator (
@@ -155,7 +160,8 @@ public class Layer : ObservableObject
 		ImageSurface surface,
 		Operator op,
 		double opacity = 1.0,
-		bool transform = true)
+		bool transform = true,
+		ResamplingMode resamplingMode = ResamplingMode.Bilinear)
 	{
 		ctx.Save ();
 
@@ -164,6 +170,9 @@ public class Layer : ObservableObject
 
 		ctx.Operator = op;
 		ctx.SetSourceSurface (surface, 0, 0);
+
+		using (var pattern = ctx.GetSource ())
+			pattern.Filter = resamplingMode.ToCairoFilter ();
 
 		if (opacity >= 1.0)
 			ctx.Paint ();

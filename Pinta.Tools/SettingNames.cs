@@ -1,15 +1,13 @@
-namespace Pinta.Tools;
+using Pinta.Core;
 
+namespace Pinta.Tools;
 internal static class SettingNames
 {
 	internal const string COLOR_PICKER_TOOL_SELECTION = "color-picker-tool-selection";
 	internal const string COLOR_PICKER_SAMPLE_SIZE = "color-picker-sample-size";
 	internal const string COLOR_PICKER_SAMPLE_TYPE = "color-picker-sample-type";
-
 	internal const string ERASER_ERASE_TYPE = "eraser-erase-type";
-
 	internal const string PAINT_BRUSH_BRUSH = "paint-brush-brush";
-
 	internal const string TEXT_FONT = "text-font";
 	internal const string TEXT_VARIANT = "text-variant";
 	internal const string TEXT_WEIGHT = "text-weight";
@@ -19,15 +17,11 @@ internal static class SettingNames
 	internal const string TEXT_STYLE = "text-style";
 	internal const string TEXT_OUTLINE_WIDTH = "text-outline-width";
 	internal const string TEXT_JOIN = "text-join";
-
 	internal const string RECOLOR_TOLERANCE = "recolor-tolerance";
-
 	internal const string GRADIENT_TYPE = "gradient-type";
 	internal const string GRADIENT_COLOR_MODE = "gradient-color-mode";
-
 	internal const string FREEFORM_SHAPE_FILL_TYPE = "freeform-shape-fill-type";
 	internal const string FREEFORM_SHAPE_DASH_PATTERN = "freeform-shape-dash_pattern";
-
 	internal const string LASSO_MODE = "lasso-mode";
 
 	internal static string Arrow1 (string prefix)
@@ -68,4 +62,7 @@ internal static class SettingNames
 
 	internal static string Radius (string prefix)
 		=> $"{prefix}-radius";
+
+	internal static string ToolResamplingMode (BaseTool tool)
+		=> $"{tool.GetType ().Name.ToLowerInvariant ()}-resampling-mode";
 }

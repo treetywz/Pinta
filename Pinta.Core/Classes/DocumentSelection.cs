@@ -166,7 +166,7 @@ public sealed class DocumentSelection
 				double x = ip.X;
 				double y = ip.Y;
 				transform.TransformPoint (ref x, ref y);
-				newPolygon.Add (new IntPoint ((long) x, (long) y));
+				newPolygon.Add (new IntPoint ((long) Math.Round (x), (long) Math.Round (y)));
 			}
 
 			newPolygons.Add (newPolygon);
