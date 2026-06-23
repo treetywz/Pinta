@@ -162,7 +162,7 @@ public sealed class PaintBrushTool : BaseBrushTool
 		g.LineCap = LineCap.Round;
 		g.SetSourceColor (strokeColor);
 
-		BrushStrokeArgs strokeArgs = new (strokeColor, e.Point, last_point.Value);
+		BrushStrokeArgs strokeArgs = new (strokeColor, e.Point, last_point.Value, UseAntialiasing);
 
 		CancelRepeatingDraw ();
 		var invalidate_rect = active_brush.DoMouseMove (g, surf, strokeArgs);

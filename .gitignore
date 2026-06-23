@@ -3,6 +3,8 @@
 *.swp
 *.userprefs
 *.pubxml
+appimagetool-x86_64.AppImage
+AppDir/
 .DS_Store
 .idea
 aclocal.m4

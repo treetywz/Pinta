@@ -66,6 +66,17 @@ public static class ToolOptionWidgetService
 			box.Append (label);
 			box.Append (spin_button);
 			integerOption.Value = optionValue; // to force callbacks to be called
+		} else if (toolOption is PercentOption percentOption) {
+			int optionValue = percentOption.Value;
+			Scale slider = GtkExtensions.CreateToolBarSlider (0, 100, 1, optionValue);
+			slider.OnValueChanged += (s, e) => {
+				percentOption.Value = (int) slider.GetValue ();
+			};
+			percentOption.OnValueChanged += v => slider.SetValue (v);
+			Label label = Label.New (string.Format ("{0}: ", percentOption.LabelText));
+			box.Append (label);
+			box.Append (slider);
+			percentOption.Value = optionValue; // force callback
 		}
 		tool_option_widgets.Add (toolOption, box);
 		return box;
